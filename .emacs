@@ -80,9 +80,59 @@
 (setq ido-vitrual-buffers      t)
 (setq ido-enable-flex-matching t)
 
-(require 'package)
-;; Any add to list for package-archives (to add marmalade or melpa) goes here
-(add-to-list 'package-archives 
-    '("MELPA" .
-      "http://melpa.milkbox.net/packages/"))
-(package-initialize)
+;; Disable backup/autosave files
+(setq make-backup-files        nil)
+(setq auto-save-default        nil)
+(setq auto-save-list-file-name nil)
+
+;; Line wrapping
+(setq word-wrap          t)
+(global-visual-line-mode t)
+
+(global-set-key [f4] 'next-error)
+(global-set-key [f3] 'previous-error)
+(global-set-key [f6] 'shell)
+(global-set-key [f9] 'compile)
+(global-set-key "\M-g" 'goto-line)
+
+;; C
+(require 'cc-mode)
+
+(global-font-lock-mode 1)
+
+(setq tab-width 4)
+(define-key c-mode-map "\C-m" 'reindent-then-newline-and-indent)
+(define-key c-mode-map "\C-ce" 'c-comment-edit)
+(setq c-auto-hungry-initial-state 'none)
+(setq c-delete-function 'backward-delete-char)
+(setq c-tab-always-indent t)
+
+;; compilation-window-height
+(setq compilation-window-height 8)
+
+;; Hide compilation buffer if no compilation errors
+(setq compilation-finish-function
+      (lambda (buf str)
+        (if (string-match "exited abnormally" str)
+            ;;there were errors
+            (message "compilation errors, press C-x ` to visit")
+          ;;no errors, make the compilation window go away in 0.5 seconds
+          (run-at-time 0.5 nil 'delete-windows-on buf)
+          (message "NO COMPILATION ERRORS!"))))
+
+(add-hook 'c-mode-hook        
+          '(lambda ( ) 
+             (c-set-style "k&r")))
+
+;; Autodetect highlight
+(defvar font-lock-auto-mode-list 
+        (list 'c-mode 'c++-mode 'c++-c-mode 'emacs-lisp-mode 'lisp-mode 'perl-mode 'scheme-mode)
+         "List of modes to always start in font-lock-mode")
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(custom-enabled-themes (quote (misterioso))))
